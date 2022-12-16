@@ -3,8 +3,15 @@
 # This little script can be used to post an update to
 # a Mastodon server.  See the manual page for details.
 #
+# This script is beerware:
+#
 # Originally written by Jan Schaumann
 # <jschauma@netmeister.org> in December 2022.
+#
+# As long as you retain this notice above, you can do
+# whatever you want with this code.  If we meet some
+# day, and you think this code is worth it, you can
+# buy me a beer in return.
 
 set -e
 umask 077
