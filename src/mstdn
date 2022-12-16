@@ -51,9 +51,9 @@ postMedia() {
 	verbose "Posting media from file '${MEDIA}'..."
 
 	curl -s -H "Authorization: Bearer ${TOKEN}"				\
-	-X POST -H "Content-Type: multipart/form-data"				\
-	https://${MASTODON_SERVER}/api/v1/media --form file="@${MEDIA}" |	\
-		sed -e 's/{[^{]*"id":"\([^"]*\)".*/\1/'
+		-X POST -H "Content-Type: multipart/form-data"			\
+		https://${MASTODON_SERVER}/api/v1/media --form file="@${MEDIA}" | \
+			sed -e 's/{[^{]*"id":"\([^"]*\)".*/\1/'
 }
 
 usage() {
