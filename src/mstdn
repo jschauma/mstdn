@@ -51,8 +51,9 @@ postMedia() {
 
 usage() {
 	cat <<EOH
-Usage: ${PROGNAME} [-hv] [-m media] [-s server] [-t file]
+Usage: ${PROGNAME} [-hiv] [-m media] [-s server] [-t file]
 	-h          print this help and exit
+	-i          print resulting message ID
 	-m media    upload and attach the given media file
         -s server   post the update to this mastodon server
 	-t file     read the access token from this file
