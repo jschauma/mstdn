@@ -1,0 +1,151 @@
+#! /bin/sh
+#
+# This little script can be used to post an update to
+# a Mastodon server.  See the manual page for details.
+#
+# Originally written by Jan Schaumann
+# <jschauma@netmeister.org> in December 2022.
+
+set -e
+umask 077
+
+###
+### Globals
+###
+
+MEDIA=""
+MEDIA_ID=""
+PRINT_ID=0
+PROGNAME="${0##*/}"
+TOKEN=""
+VERBOSITY=0
+
+###
+### Functions
+###
+
+checkFile() {
+	local file="${1}"
+	verbose "Checking that '${file}' exists and is readable..."
+
+	if [ ! -r "${file}" ]; then
+		echo "Unable to read '${file}'." >&2
+		exit 1
+		# NOTREACHED
+	fi
+}
+
+getToken() {
+	verbose "Reading token from '${TOKEN_FILE}'..."
+	tr -d '\n' <"${TOKEN_FILE}"
+}
+
+postMedia() {
+	verbose "Posting media from file '${MEDIA}'..."
+
+	curl -s -H "Authorization: Bearer ${TOKEN}"				\
+	-X POST -H "Content-Type: multipart/form-data"				\
+	https://${MASTODON_SERVER}/api/v1/media --form file="@${MEDIA}" |	\
+		sed -e 's/{[^{]*"id":"\([^"]*\)".*/\1/'
+}
+
+usage() {
+	cat <<EOH
+Usage: ${PROGNAME} [-hv] [-m media] [-s server] [-t file]
+	-h          print this help and exit
+	-m media    upload and attach the given media file
+        -s server   post the update to this mastodon server
+	-t file     read the access token from this file
+	-v          be verbose
+EOH
+}
+
+verbose() {
+	local readonly msg="${1}"
+	local level="${2:-1}"
+	local i=0
+
+	if [ ${level} -le ${VERBOSITY} ]; then
+		while [ ${i} -lt ${level} ]; do
+			printf "=" >&2
+			i=$(( ${i} + 1 ))
+		done
+		echo "> ${msg}" >&2
+	fi
+}
+
+###
+### Main
+###
+
+while getopts 'him:s:t:v' opt; do
+	case "${opt}" in
+		h\?)
+			usage
+			exit 0
+			# NOTREACHED
+		;;
+		i)
+			PRINT_ID=1
+		;;
+		m)
+			MEDIA="${OPTARG}"
+			checkFile "${MEDIA}"
+		;;
+		s)
+			MASTODON_SERVER="${OPTARG}"
+		;;
+		t)
+			TOKEN_FILE="${OPTARG}"
+			checkFile "${TOKEN_FILE}"
+		;;
+		v)
+			VERBOSITY=$(( ${VERBOSITY} + 1 ))
+		;;
+		*)
+			usage
+			exit 1
+			# NOTREACHED
+		;;
+	esac
+done
+shift $(($OPTIND - 1))
+
+if [ $# -ne 0 ]; then
+	usage
+	exit 1
+	# NOTREACHED
+fi
+
+: ${MASTODON_SERVER:="mstdn.social"}
+: ${TOKEN_FILE:="${HOME}/.mstdn/${MASTODON_SERVER}"}
+
+# In case the user specified e.g., https://some.server:
+MASTODON_SERVER="${MASTODON_SERVER##*/}"
+
+TOKEN="$(getToken)"
+
+mediaopt=""
+if [ -n "${MEDIA}" ]; then
+	MEDIA_ID="$(postMedia)"
+	if [ -z "${MEDIA_ID}" ]; then
+		echo "Unable to post media!" >&2
+		exit 1
+		# NOTREACHED
+	fi
+	mediaopt="-F media_ids[]=${MEDIA_ID}"
+fi
+
+sid=$(curl -s -H "Authorization: Bearer ${TOKEN}"	\
+	-X POST -H "Content-Type: multipart/form-data"	\
+	-F status="$(cat)"				\
+	${mediaopt}					\
+	https://${MASTODON_SERVER}/api/v1/statuses |	\
+		sed -e 's/{[^{]*"id":"\([^"]*\)".*/\1/')
+
+if [ -z "${sid}" ] || [ x"${sid}" = x"null" ]; then
+	echo "Unable to post status update!" >&2
+	exit 1
+elif [ ${PRINT_ID} = 1 ]; then
+	echo "${sid}"
+fi

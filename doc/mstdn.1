@@ -1,0 +1,98 @@
+.Dd December 16, 2022
+.Dt MSTDN 1
+.Os
+.Sh NAME
+.Nm mstdn
+.Nd send a mastodon update
+.Sh SYNOPSIS
+.Nm
+.Op Fl hiv
+.Op Fl m Ar media
+.Op Fl s Ar server
+.Op Fl t Ar file
+.Sh DESCRIPTION
+.Nm
+is a very simple tool to send a Mastodon update to the
+given server - nothing else.
+The message to send is read from STDIN; the account to
+post as is defined via the access token found in the
+file passed to
+.Fl t .
+.Sh OPTIONS
+The following options are supported by
+.Nm :
+.Bl -tag -width s_server_
+.It Fl h
+Print a short usage statement and exit.
+.It Fl i
+Print the resulting message ID.
+.It Fl m Ar media
+Upload and attach the given media (picture or video).
+.It Fl s Ar server
+Post the update to this Mastodon server.
+Default: mstdn.social
+.It Fl t Ar file
+Read the access token from this file.
+Default: ~/.mstdn/<server>
+.It Fl v
+Be verbose.
+Can be specified multiple times to increase verbosity.
+.El
+.Sh AUTHORIZATION
+In order to use
+.Nm ,
+you will need to get an access token and place it into
+a file.
+The token can be retrieved by going to
+Preferences->Development on your Mastodon server and
+adding a "new application".
+The application will only need the "write:media" and
+"write:statuses" privileges.
+After creating the application, you should be able to
+copy the "access token" from the application details.
+.Sh EXAMPLES
+The following examples illustrate common usage of this
+tool.
+.Pp
+To send a simple message to the default Mastodon
+server reading the access token from the default
+location:
+.Bd -literal -offset indent
+echo "I can't believe I used the word 'toot'." | mstdn
+.Ed
+.Pp
+To post the contents of the file 'msg' together with
+the image 'file.jp' to the 'chaos.social' instance
+using an access token from the file '~/mytoken':
+.Bd -literal -offset indent
+mstdn -t ~/mytoken -s chaos.social -m file.jpg <msg
+.Ed
+.Sh EXIT STATUS
+.Ex -std
+.Sh ENVIRONMENT
+The following environment variables affect the
+execution of this tool:
+.Bl -tag -width MASTODON_SERVER
+.It Ev MASTODON_SERVER
+The Mastodon server to post the update to.
+The
+.Fl s
+flag overrides this value.
+.It Ev TOKEN_FILE
+The file to read the access token from.
+The
+.Fl t
+flag overrides this value.
+If not specified, then this value defaults to the
+pathname
+.Dv ~/.mstdn/${MASTODON_SERVER} .
+.El
+.Sh HISTORY
+.Nm
+was originally written by
+.An Jan Schaumann
+.Aq jschauma@netmeister.org
+in December 2022.
+.Sh BUGS
+Please file bugs and feature requests via GitHub pull
+requests and issues or by emailing the author.
