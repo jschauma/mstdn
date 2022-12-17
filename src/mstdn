@@ -20,6 +20,7 @@ umask 077
 ### Globals
 ###
 
+DESCR=""
 MEDIA=""
 MEDIA_ID=""
 PRINT_ID=0
@@ -50,10 +51,12 @@ getToken() {
 postMedia() {
 	verbose "Posting media from file '${MEDIA}'..."
 
-	curl -s -H "Authorization: Bearer ${TOKEN}"				\
-		-X POST -H "Content-Type: multipart/form-data"			\
-		https://${MASTODON_SERVER}/api/v1/media --form file="@${MEDIA}" | \
-			sed -e 's/{[^{]*"id":"\([^"]*\)".*/\1/'
+	curl -s -H "Authorization: Bearer ${TOKEN}"		\
+		-X POST -H "Content-Type: multipart/form-data"	\
+		https://${MASTODON_SERVER}/api/v1/media		\
+		-F file="@${MEDIA}"				\
+		-F description="${DESCR}" |			\
+		sed -e 's/{[^{]*"id":"\([^"]*\)".*/\1/'
 }
 
 usage() {
@@ -86,8 +89,11 @@ verbose() {
 ### Main
 ###
 
-while getopts 'him:s:t:v' opt; do
+while getopts 'hd:im:s:t:v' opt; do
 	case "${opt}" in
+		d)
+			DESCR="${OPTARG}"
+		;;
 		h\?)
 			usage
 			exit 0
@@ -135,6 +141,9 @@ TOKEN="$(getToken)"
 
 mediaopt=""
 if [ -n "${MEDIA}" ]; then
+	if [ -z "${DESCR}" ]; then
+		DESCR="${MEDIA##*/}"
+	fi
 	MEDIA_ID="$(postMedia)"
 	if [ -z "${MEDIA_ID}" ]; then
 		echo "Unable to post media!" >&2
@@ -142,6 +151,10 @@ if [ -n "${MEDIA}" ]; then
 		# NOTREACHED
 	fi
 	mediaopt="-F media_ids[]=${MEDIA_ID}"
+elif [ -n "${DESCR}" ]; then
+	echo "'-d' without '-m' makes no sense." >&2
+	exit 1
+	# NOTREACHED
 fi
 
 sid=$(curl -s -H "Authorization: Bearer ${TOKEN}"	\

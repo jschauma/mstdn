@@ -7,6 +7,7 @@
 .Sh SYNOPSIS
 .Nm
 .Op Fl hiv
+.Op Fl d Ar descr
 .Op Fl m Ar media
 .Op Fl s Ar server
 .Op Fl t Ar file
@@ -22,6 +23,11 @@ file passed to
 The following options are supported by
 .Nm :
 .Bl -tag -width s_server_
+.It Fl d Ar descr
+Use the given description for the media to be uploaded
+via
+.Fl m .
+Use quotes for strings including spaces.
 .It Fl h
 Print a short usage statement and exit.
 .It Fl i

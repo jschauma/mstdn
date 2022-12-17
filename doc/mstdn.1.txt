@@ -4,7 +4,7 @@ NAME
      mstdn  send a mastodon update
 
 SYNOPSIS
-     mstdn [-hiv] [-m media] [-s server] [-t file]
+     mstdn [-hiv] [-d descr] [-m media] [-s server] [-t file]
 
 DESCRIPTION
      mstdn is a very simple tool to send a Mastodon update to the given server -
@@ -13,6 +13,9 @@ DESCRIPTION
 
 OPTIONS
      The following options are supported by mstdn:
+
+     -d descr	Use the given description for the media to be uploaded via -m.
+		Use quotes for strings including spaces.
 
      -h		Print a short usage statement and exit.
 
