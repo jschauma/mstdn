@@ -31,7 +31,7 @@ Please see the manual page for all details:
 
 ```
 NAME
-     mstdn  send a mastodon update
+     mstdn - send a mastodon update
 
 SYNOPSIS
      mstdn [-hiv] [-d descr] [-m media] [-s server] [-t file]
@@ -84,7 +84,7 @@ EXAMPLES
 	   mstdn -t ~/mytoken -s chaos.social -m file.jpg <msg
 
 EXIT STATUS
-     The mstdn utility exits0 on success, and>0 if an error occurs.
+     The mstdn utility exits 0 on success, and >0 if an error occurs.
 
 ENVIRONMENT
      The following environment variables affect the execution of this tool:
@@ -97,7 +97,7 @@ ENVIRONMENT
 		      defaults to the pathname ~/.mstdn/${MASTODON_SERVER}.
 
 HISTORY
-     mstdn was originally written by Jan Schaumann jschauma@netmeister.org in
+     mstdn was originally written by Jan Schaumann <jschauma@netmeister.org> in
      December 2022.
 
 BUGS
