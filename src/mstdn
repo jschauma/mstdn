@@ -161,7 +161,7 @@ sid=$(curl -s -H "Authorization: Bearer ${TOKEN}"	\
 	-X POST -H "Content-Type: multipart/form-data"	\
 	-F status="$(cat)"				\
 	${mediaopt}					\
-	https://${MASTODON_SERVER}/api/v1/statuses |	\
+	https://${MASTODON_SERVER}/api/v1/statuses  |	\
 		sed -e 's/{[^{]*"id":"\([^"]*\)".*/\1/')
 
 if [ -z "${sid}" ] || [ x"${sid}" = x"null" ]; then
